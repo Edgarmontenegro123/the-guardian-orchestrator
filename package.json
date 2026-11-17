@@ -1,0 +1,19 @@
+{
+  "name": "the-guardian-orchestrator",
+  "version": "1.0.0",
+  "description": "Reactive log ingestion micro-orchestrator with clustering, shared memory and Docker",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "cluster",
+    "worker-threads",
+    "atomics",
+    "docker"
+  ],
+  "author": "Edgar Montenegro",
+  "license": "ISC"
+}
