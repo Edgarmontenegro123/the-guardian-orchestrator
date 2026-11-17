@@ -1,9 +1,10 @@
-import crypto from 'node:crypto'
+import crypto from 'node:crypto' // Para generar los hashes SHA-256
 import {parentPort, workerData} from 'node:worker_threads'
 import {HEAVY_TASK_ITERATIONS} from '../config/constants.js'
 
 const sharedView = new Int32Array(workerData.sharedBuffer)
 
+// Simula un procesamiento pesado
 const executeHeavyComputation = (logId) => {
     let hash = String(logId)
     for (let i = 0; i < HEAVY_TASK_ITERATIONS; i++) {

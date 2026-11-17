@@ -12,11 +12,15 @@ const __dirname = path.dirname(__filename)
 let isShuttingDown = false
 let globalClusterCount = 0
 
+// Crea un bloque de memoria RAM de 4 bytes
 const sharedBuffer = new SharedArrayBuffer(SHARED_BUFFER_BYTES)
+// Crea una vista estructurada de ese búfer para manejar números enteros
 const sharedView = new Int32Array(sharedBuffer)
+// Un mapa para registrar las promesas pendientes
 const pendingTasks = new Map()
 
 const workerThreadPath = path.join(__dirname, 'logProcessor.js')
+// Lanza el hilo independiente (logProcessor.js) en otro núcleo de la CPU y le pasa el sharedBuffer a través de workerData
 const processorThread = new Worker(workerThreadPath, {
     workerData: {sharedBuffer}
 })
@@ -44,6 +48,8 @@ processorThread.on('error', async (error) => {
     await writeLog('error', `Worker thread error: ${error.message}`)
 })
 
+/*  Cuando entra una petición /ingest, crea un ID único, guarda la promesa en el mapa,
+    y le envía la tarea al hilo hijo con processorThread.postMessage */
 const delegateIngestTask = (logId) => {
     return new Promise((resolve, reject) => {
         const requestId = crypto.randomUUID()
@@ -56,6 +62,7 @@ const server = createHttpServer({
     onIngest: delegateIngestTask,
     getStatus: () => ({
         isShuttingDown,
+        // garantiza una lectura segura y directa desde la RAM compartida sin riesgos de race conditions.
         localCount: Atomics.load(sharedView, 0),
         globalCount: globalClusterCount
     })

@@ -8,6 +8,7 @@ export const createHttpServer = ({onIngest, getStatus}) => {
         const parsedUrl = new URL(req.url, 'http://localhost')
         const pathname = parsedUrl.pathname
 
+        // Si llega una petición GET a /health, responde de forma inmediata con el estado ok y el PID del worker que atendió la petición.
         if (pathname === '/health' && req.method === 'GET') {
             res.writeHead(200, {'Content-Type': 'application/json'})
             res.end(JSON.stringify({

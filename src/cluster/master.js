@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename)
 let totalIngestedLogs = 0
 let isMasterShuttingDown = false
 
+// Recorre workers conectados y avisa mediante IPC el nuevo valor total acumulado
 const broadcastGlobalCount = () => {
     for (const worker of Object.values(cluster.workers)) {
         if (worker && worker.isConnected()) {
@@ -19,6 +20,8 @@ const broadcastGlobalCount = () => {
     }
 }
 
+/*Se le conecta a cada worker hijo para escuchar cuando un cliente envía un log (LOG_INGESTED).
+Cuando llega ese mensaje, el Master incrementa el contador global y se lo retransmite a todos los demás hijos*/
 const attachWorkerListeners = (worker) => {
     worker.on('message', (msg) => {
         if (msg?.type === 'LOG_INGESTED') {
